@@ -8,6 +8,11 @@ public class HomeController {
 
     @GetMapping
     public String home() {
-        return "Welcome to this Crypto Trading Platform";
+        return "Welcome to this Crypto Tradingg Platform";
+    }
+
+    @GetMapping("/api")
+    public String secure(){
+        return "secure!!";
     }
 }

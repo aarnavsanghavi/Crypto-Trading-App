@@ -1,0 +1,10 @@
+/home/aarnav-sanghavi/Desktop/projects/Crypto-Trading-App/Crypto-Trading-App/src/main/java/com/SEProject/controller/AuthController.java
+/home/aarnav-sanghavi/Desktop/projects/Crypto-Trading-App/Crypto-Trading-App/src/main/java/com/SEProject/model/User.java
+/home/aarnav-sanghavi/Desktop/projects/Crypto-Trading-App/Crypto-Trading-App/src/main/java/com/SEProject/repository/UserRepository.java
+/home/aarnav-sanghavi/Desktop/projects/Crypto-Trading-App/Crypto-Trading-App/src/main/java/com/SEProject/model/TwoFactorAuth.java
+/home/aarnav-sanghavi/Desktop/projects/Crypto-Trading-App/Crypto-Trading-App/src/main/java/com/SEProject/CryptoTradingPlatformApplication.java
+/home/aarnav-sanghavi/Desktop/projects/Crypto-Trading-App/Crypto-Trading-App/src/main/java/com/SEProject/domain/USER_ROLE.java
+/home/aarnav-sanghavi/Desktop/projects/Crypto-Trading-App/Crypto-Trading-App/src/main/java/com/SEProject/config/AppConfig.java
+/home/aarnav-sanghavi/Desktop/projects/Crypto-Trading-App/Crypto-Trading-App/src/main/java/com/SEProject/domain/VerificationType.java
+/home/aarnav-sanghavi/Desktop/projects/Crypto-Trading-App/Crypto-Trading-App/src/main/java/com/SEProject/HomeController.java
+/home/aarnav-sanghavi/Desktop/projects/Crypto-Trading-App/Crypto-Trading-App/src/main/java/com/SEProject/config/JwtTokenValidator.java
