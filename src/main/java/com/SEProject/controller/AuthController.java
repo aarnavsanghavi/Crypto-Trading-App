@@ -1,11 +1,19 @@
 package com.SEProject.controller;
 
+import com.SEProject.config.JwtProvider;
 import com.SEProject.model.User;
 import com.SEProject.repository.UserRepository;
+import com.SEProject.response.AuthResponse;
+import com.SEProject.service.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,15 +25,68 @@ public class AuthController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private CustomUserDetailsService customUserDetailsService;
+
     @PostMapping("/signup")
-    public ResponseEntity<User> register(@RequestBody User user){
+    public ResponseEntity<AuthResponse> register(@RequestBody User user) throws Exception {
+        User isEmailExist = userRepository.findByEmail(user.getEmail());
+        if(isEmailExist != null){
+            throw new Exception("Email is already accessed with another account");
+        }
+
         User newUser = new User();
         newUser.setEmail(user.getEmail());
         newUser.setPassword(user.getPassword());
         newUser.setFullName(user.getFullName());
+
+
         User savedUser = userRepository.save(newUser);
 
-        return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
+        Authentication authentication=new UsernamePasswordAuthenticationToken(user.getEmail(),user.getPassword());
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String jwt = JwtProvider.generateToken(authentication);
+        AuthResponse res = new AuthResponse();
+        res.setJwt(jwt);
+        res.setStatus(true);
+        res.setMessage("Registered Successfully");
+        return new ResponseEntity<>(res, HttpStatus.CREATED);
     }
-    
+
+    @PostMapping("/signin")
+    public ResponseEntity<AuthResponse> login(@RequestBody User user) throws Exception {
+
+
+        String userName = user.getEmail();
+        String password = user.getPassword();
+
+
+
+
+        Authentication authentication= authenticate(userName, password);
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String jwt = JwtProvider.generateToken(authentication);
+        AuthResponse res = new AuthResponse();
+        res.setJwt(jwt);
+        res.setStatus(true);
+        res.setMessage("Login Success");
+        return new ResponseEntity<>(res, HttpStatus.CREATED);
+    }
+
+    private Authentication authenticate(String userName, String password) {
+        UserDetails userDetails = customUserDetailsService.loadUserByUsername(userName);
+
+        if(userDetails == null){
+            throw new BadCredentialsException("Invalid Username");
+        }
+        if(!password.equals(userDetails.getPassword())){
+            throw new BadCredentialsException("Invalid Password");
+        }
+
+        return new UsernamePasswordAuthenticationToken(userName, password, userDetails.getAuthorities());
+    }
+
+
 }

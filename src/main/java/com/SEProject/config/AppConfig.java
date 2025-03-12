@@ -25,6 +25,7 @@ public class AppConfig {
     }
 
     private CorsConfigurationSource corsConifugrationSource() {
+
         return null;
     }
 }
