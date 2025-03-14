@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.OneToOne;
 import lombok.Data;
+import jakarta.persistence.Id;
 
 @Entity
 @Data
@@ -13,7 +14,7 @@ public class ForgotPasswordToken {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private String Id;
+    private String id;
 
     @OneToOne
     private User user;
