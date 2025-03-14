@@ -41,18 +41,16 @@ public class AuthController {
         if(isEmailExist != null){
             throw new Exception("Email is already accessed with another account");
         }
-
         User newUser = new User();
         newUser.setEmail(user.getEmail());
         newUser.setPassword(user.getPassword());
         newUser.setFullName(user.getFullName());
-
-
         User savedUser = userRepository.save(newUser);
 
         Authentication authentication=new UsernamePasswordAuthenticationToken(user.getEmail(),user.getPassword());
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
+        //create jwt token which will hold our method for creating new jwt token and one for accessing email
         String jwt = JwtProvider.generateToken(authentication);
         AuthResponse res = new AuthResponse();
         res.setJwt(jwt);
@@ -63,21 +61,12 @@ public class AuthController {
 
     @PostMapping("/signin")
     public ResponseEntity<AuthResponse> login(@RequestBody User user) throws Exception {
-
-
         String userName = user.getEmail();
         String password = user.getPassword();
-
-
-
-
         Authentication authentication= authenticate(userName, password);
-
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = JwtProvider.generateToken(authentication);
-
         User authUser = userRepository.findByEmail(userName);
-
         if(user.getTwoFactorAuth().isEnabled()){
             AuthResponse res = new AuthResponse();
             res.setMessage("Two Factor Authentication Enabled");
@@ -87,18 +76,13 @@ public class AuthController {
             TwoFactorOTP oldTwoFactorOTP = twoFactorOTPService.findByUser(authUser.getId());
             if(oldTwoFactorOTP != null){
                 twoFactorOTPService.deleteTwoFactorOTP(oldTwoFactorOTP);
-
             }
-
             TwoFactorOTP newTwoFactorOTP = twoFactorOTPService.createTwoFactorOTP(
                     authUser, otp, jwt);
-
             emailService.sendVerificationOtpEmail(userName, otp);
-
             res.setSession(newTwoFactorOTP.getId());
             return new ResponseEntity<>(res, HttpStatus.ACCEPTED);
         }
-
         AuthResponse res = new AuthResponse();
         res.setJwt(jwt);
         res.setStatus(true);
@@ -108,21 +92,18 @@ public class AuthController {
 
     private Authentication authenticate(String userName, String password) {
         UserDetails userDetails = customUserDetailsService.loadUserByUsername(userName);
-
         if(userDetails == null){
             throw new BadCredentialsException("Invalid Username");
         }
         if(!password.equals(userDetails.getPassword())){
             throw new BadCredentialsException("Invalid Password");
         }
-
         return new UsernamePasswordAuthenticationToken(userName, password, userDetails.getAuthorities());
     }
-
+    @PostMapping("/two-factor/otp/{otp}")
     public ResponseEntity<AuthResponse> verifySignInOtp(
             @PathVariable String otp,
             @RequestParam String id) throws Exception {
-
         TwoFactorOTP twoFactorOTP = twoFactorOTPService.findById(id);
         if(twoFactorOTPService.verifyTwoFactorOTP(twoFactorOTP, otp)){
             AuthResponse res = new AuthResponse();
@@ -130,11 +111,7 @@ public class AuthController {
             res.setTwoFactorAuthEnabled(true);
             res.setJwt(twoFactorOTP.getJwt());
             return new ResponseEntity<>(res, HttpStatus.OK);
-
-
         }
         throw new Exception("Invalid OTP");
     }
-
-
 }

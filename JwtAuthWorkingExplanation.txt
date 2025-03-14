@@ -1,0 +1,134 @@
+A JSON Web Token (JWT) is a compact, URL-safe means of representing claims to be transferred between two parties.
+It is commonly used for authentication and authorization in web applications. A JWT consists of three parts separated by dots (.):
+
+Header.Payload.Signature
+1. Header
+    The header typically consists of two parts:
+        Token type: JWT
+        Signing algorithm: The algorithm used to sign the token (e.g., HS256, RS256).
+        Example:
+        {
+          "alg": "HS256",
+          "typ": "JWT"
+        }
+        Encoded: The header is Base64Url encoded to form the first part of the JWT.
+
+2.Payload
+    The payload contains the claims, which are statements about an entity (typically the user) and additional data. There are three types of claims:
+        Registered claims: Predefined claims like iss (issuer), exp (expiration time), sub (subject), aud (audience), etc.
+        Public claims: Custom claims defined by the application (e.g., email, roles).
+        Private claims: Custom claims agreed upon between parties.
+        Example:
+        {
+          "sub": "1234567890",
+          "name": "John Doe",
+          "email": "john.doe@example.com",
+          "roles": "ROLE_USER,ROLE_ADMIN",
+          "iat": 1516239022,
+          "exp": 1516242622
+        }
+        Encoded: The header is Base64Url encoded to form the first part of the JWT.
+
+3. Signature
+    The signature is used to verify that the token was not tampered with.
+    It is created by signing the encoded header and payload using a secret key (for HMAC algorithms) or a private key (for RSA algorithms).
+    Example (for HMAC SHA-256):
+        HMACSHA256(
+          base64UrlEncode(header) + "." + base64UrlEncode(payload),
+          secret_key
+        )
+    The signature is Base64Url encoded to form the third part of the JWT.
+
+A complete JWT looks like this:
+    eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+        Header: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+        Payload: eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ
+        Signature: SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+
+Key Points
+    JWTs are compact: They can be sent in URLs, POST requests, or HTTP headers.
+    JWTs are self-contained: They include all necessary information about the user.
+    JWTs are signed: They can be verified to ensure they haven't been tampered with.
+
+Our JWT class in jwtprovider:
+String jwt = Jwts.builder()
+    .setIssuedAt(new Date())
+    .setExpiration(new Date(new Date().getTime() + 86400000)) // 24 hours
+    .claim("email", authentication.getName())
+    .claim("authorities", roles)
+    .signWith(key)
+    .compact();
+This creates a JWT with:
+    Header: Default (HS256 algorithm).
+    Payload: Contains email and authorities claims, along with iat (issued at) and exp (expiration).
+    Signature: Signed using the SECRET_KEY.
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+JwtConstant.java
+
+This file defines constants used across the JWT-related classes.
+
+Purpose: This class holds constants that are used for JWT generation and validation.
+
+    SECRET_KEY: A secret key used to sign and verify JWTs. This key should be kept secure in a real-world application (e.g., stored in environment variables or a secure vault).
+
+    JWT_HEADER: The name of the HTTP header where the JWT token is expected to be found (e.g., Authorization).
+
+Interconnection:
+
+    The SECRET_KEY is used in JwtProvider and JwtTokenValidator to sign and verify JWTs.
+
+    The JWT_HEADER is used in JwtTokenValidator to extract the JWT from the HTTP request.
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+JwtProvider.java
+
+This class is responsible for generating and parsing JWTs.
+
+Purpose: This class provides methods to generate and parse JWTs.
+
+generateToken:
+    Generates a JWT for an authenticated user.
+    Includes the user's email and authorities (roles) as claims in the token.
+    Sets the token's expiration time to 24 hours from the current time.
+    Signs the token using the SECRET_KEY.
+
+getEmailFromToken:
+    Extracts the email from a given JWT.
+    Removes the Bearer prefix from the token before parsing.
+
+populateAuthorities:
+    Converts a collection of GrantedAuthority objects into a comma-separated string of authorities.
+
+Interconnection:
+    Uses JwtConstant.SECRET_KEY to sign and verify JWTs.
+    The generated token is used by JwtTokenValidator to authenticate requests.
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+JwtTokenValidator.java
+This class is a Spring Security filter that validates JWTs in incoming requests.
+
+Purpose: This class validates JWTs in incoming requests and sets the authentication in the Spring Security context.
+
+doFilterInternal:
+    Extracts the JWT from the Authorization header.
+    Removes the Bearer prefix from the token.
+    Parses the JWT using the SECRET_KEY to extract claims (email and authorities).
+    Creates an Authentication object and sets it in the SecurityContextHolder.
+    If the token is invalid, it throws an exception.
+
+Interconnection:
+    Uses JwtConstant.JWT_HEADER to extract the token from the request.
+    Uses JwtConstant.SECRET_KEY to verify the token.
+    Relies on the token format generated by JwtProvider.
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Workflow:
+    A user logs in and is authenticated by Spring Security.
+    JwtProvider generates a JWT for the authenticated user.
+    The JWT is sent to the client and included in the Authorization header of subsequent requests.
+    For each request, JwtTokenValidator validates the JWT and sets the authentication in the security context.
+    The application processes the request with the authenticated user's details.
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -15,7 +15,13 @@ public interface TwoFactorOTPService {
 
     void deleteTwoFactorOTP(TwoFactorOTP twoFactorOTP);
 
-
-
-
 }
+/*
+Purpose of TwoFactorOTPService
+    This service interface is responsible for:
+    Creating OTPs: Generating and storing OTPs for 2FA.
+    Retrieving OTPs: Fetching OTP records by user or ID.
+    Verifying OTPs: Validating OTPs provided by users during the 2FA process.
+    Deleting OTPs: Removing OTP records after they are used or expired.
+*/
+
