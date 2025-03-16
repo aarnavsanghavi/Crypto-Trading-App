@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 import java.util.Optional;
 
 @Service
-public class WalletServiceimpl implements WalletService {
+public class  WalletServiceimpl implements WalletService {
     @Autowired
     private WalletRepository walletRepository;
     @Override

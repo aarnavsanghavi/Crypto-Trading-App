@@ -4,11 +4,9 @@ import com.SEProject.model.Order;
 import com.SEProject.model.User;
 import com.SEProject.model.Wallet;
 import com.SEProject.model.WalletTransaction;
-import com.SEProject.repository.WalletRepository;
+import com.SEProject.service.OrderService;
 import com.SEProject.service.UserService;
 import com.SEProject.service.WalletService;
-import com.SEProject.service.WalletServiceimpl;
-import com.nimbusds.oauth2.sdk.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +21,9 @@ public class WalletController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private OrderService orderService;
 
     @GetMapping("/api/wallet")
     public ResponseEntity<Wallet> getUserWallet(@RequestHeader("Authorization") String jwt) throws Exception {
