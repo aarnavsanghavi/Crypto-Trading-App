@@ -4,6 +4,8 @@ import com.SEProject.domain.PaymentMethod;
 import com.SEProject.model.PaymentOrder;
 import com.SEProject.model.User;
 import com.SEProject.response.PaymentResponse;
+import com.razorpay.RazorpayException;
+import com.stripe.exception.StripeException;
 
 public interface PaymentService {
 
@@ -11,7 +13,9 @@ public interface PaymentService {
                              PaymentMethod paymentMethod);
     PaymentOrder getPaymentOrderById(Long id);
 
-    Boolean ProcceedPaymentOrder(PaymentOrder paymentOrder, String paymentId);
+    Boolean ProcceedPaymentOrder(PaymentOrder paymentOrder, String paymentId) throws RazorpayException;
 
-    PaymentResponse createRazorpayPaymentList(User user, Long amount);
+    PaymentResponse createRazorpayPaymentLink(User user, Long amount) throws RazorpayException;
+
+    PaymentResponse createStripePaymentLink(User user, Long amount, Long orderId) throws StripeException;
 }
