@@ -10,11 +10,13 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity
+@Table(name = "`order`") // Escape the reserved keyword "order"
 public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
     @ManyToOne
     private User user;
 
@@ -24,15 +26,11 @@ public class Order {
     @Column(nullable = false)
     private BigDecimal price;
 
-    private LocalDateTime timestamp=LocalDateTime.now();
+    private LocalDateTime timestamp = LocalDateTime.now();
 
     @Column(nullable = false)
     private OrderStatus status;
 
     @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
     private OrderItem orderItem;
-
-
-
-
 }
