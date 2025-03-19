@@ -1,0 +1,7 @@
+package com.SEProject.repository;
+
+import com.SEProject.model.PaymentOrder;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface PaymentOrderRepository extends JpaRepository<PaymentOrder, Long> {
+}
