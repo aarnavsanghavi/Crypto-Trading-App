@@ -179,7 +179,7 @@ public class CoinServiceImpl implements CoinService{
     }
 
     @Override
-    public String getTradingCoins() {
+    public String getTrendingCoins() {
         String url = "https://api.coingecko.com/api/v3/search/trending";
 
         RestTemplate restTemplate = new RestTemplate();

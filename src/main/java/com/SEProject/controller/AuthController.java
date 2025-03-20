@@ -8,6 +8,7 @@ import com.SEProject.response.AuthResponse;
 import com.SEProject.service.CustomUserDetailsService;
 import com.SEProject.service.EmailService;
 import com.SEProject.service.TwoFactorOTPService;
+import com.SEProject.service.WatchlistService;
 import com.SEProject.utils.OtpUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,6 +34,9 @@ public class AuthController {
     private TwoFactorOTPService twoFactorOTPService;
 
     @Autowired
+    private WatchlistService watchlistService;
+
+    @Autowired
     private EmailService emailService;
 
     @PostMapping("/signup")
@@ -46,6 +50,8 @@ public class AuthController {
         newUser.setPassword(user.getPassword());
         newUser.setFullName(user.getFullName());
         User savedUser = userRepository.save(newUser);
+
+        watchlistService.createWatchlist(savedUser);
 
         Authentication authentication=new UsernamePasswordAuthenticationToken(user.getEmail(),user.getPassword());
 
