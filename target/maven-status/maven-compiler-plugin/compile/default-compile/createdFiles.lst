@@ -1,0 +1,9 @@
+com/SEProject/model/TwoFactorAuth.class
+com/SEProject/model/Coin.class
+com/SEProject/model/Watchlist.class
+com/SEProject/repository/VerificationCodeRepository.class
+com/SEProject/model/VerificationCode.class
+com/SEProject/model/User.class
+com/SEProject/request/ResetPasswordRequest.class
+com/SEProject/domain/USER_ROLE.class
+com/SEProject/domain/VerificationType.class
